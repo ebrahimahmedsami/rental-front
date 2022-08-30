@@ -277,7 +277,7 @@ export class AddUnitComponent implements OnInit, AfterViewInit  {
                 if (error.utility === 0) {
                     return;
                 }
-                this.formErrors = error?.error;
+                this.formErrors = error;
                 if (this.formErrors) {
                     for (const prop in this.formErrors) {
                         if (this.form) {

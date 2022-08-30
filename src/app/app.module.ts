@@ -13,6 +13,7 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { ConfirmationDialogComponent } from './shared/delete/confirmation-dialog-component';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {
   DefaultDataServiceConfig,
   EntityDataModule,
@@ -45,7 +46,14 @@ export const defaultDataServiceConfig: DefaultDataServiceConfig = {
     AppRoutingModule,
     AuthenticationModule,
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
-    EntityDataModule.forRoot({})
+    EntityDataModule.forRoot({}),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+        deps: [HttpClient]
+      }
+    })
   ],
   declarations: [
     AppComponent,
@@ -57,8 +65,9 @@ export const defaultDataServiceConfig: DefaultDataServiceConfig = {
   providers: [
     {
       provide: STEPPER_GLOBAL_OPTIONS,
-      useValue: { showError: true }
+      useValue: { showError: true },
     },
+      HttpClient,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HttpUrlGenerator, useClass: AppHttpUrlGenerator },

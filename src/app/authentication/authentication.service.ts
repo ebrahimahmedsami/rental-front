@@ -54,6 +54,6 @@ export class AuthenticationService extends BaseService<User> {
     }
 
     isLandlord() {
-        this.store.pipe(select(selectorIsLandlord)).subscribe(isLandlord => !!isLandlord);
+        return this.store.pipe(select(selectorIsLandlord));
     }
 }

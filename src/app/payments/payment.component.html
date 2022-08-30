@@ -17,7 +17,7 @@
                     <div class="card-body">
                         <div class="row search-form-section">
                             <ng-container *robiPermission="['create-payment']">
-                                <div class="col-5" *ngIf="isAdmin$ | async">
+                                <div class="col-5" >
                                     <button [disabled]="(dataSource?.loading$ | async)"
                                             mat-button matPrefix mat-stroked-button aria-label="add new"
                                             (click)="addDialog()">
@@ -25,7 +25,7 @@
                                     </button>
                                 </div>
                             </ng-container>
-                            <div class="col-7" [hidden]="!(isAdmin$ | async)">
+                            <div class="col-7">
                                 <mat-form-field class="search-form-field">
                                     <input matInput #search placeholder="{{ 'robi.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
                                     <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
@@ -100,7 +100,7 @@
                                                 <span>Receipt</span>
                                             </button>
                                             <ng-container *robiPermission="['approve-payment']">
-                                                <ng-container *ngIf="isAdmin$ | async">
+                                                <ng-container>
                                                     <button *ngIf="row.is_pending" mat-menu-item matTooltip="Approve Payment." [matTooltipPosition]="'above'"
                                                             (click)="approvePayment(row)">
                                                         <mat-icon class="text-success" color="">check_circle</mat-icon>
@@ -109,7 +109,7 @@
                                                 </ng-container>
                                             </ng-container>
                                             <ng-container *robiPermission="['cancel-payment']">
-                                                <ng-container *ngIf="isAdmin$ | async">
+                                                <ng-container>
                                                     <button *ngIf="row.is_pending" mat-menu-item matTooltip="Cancel Payment." [matTooltipPosition]="'above'"
                                                             (click)="cancelPayment(row)">
                                                         <mat-icon color="warn">highlight_off</mat-icon>

@@ -1,0 +1,100 @@
+<div class="main-content">
+    <ng-template #no_data>
+        <div class="not-found">
+            <mat-icon>error</mat-icon> Not Found
+        </div>
+    </ng-template>
+    <div class="container-fluid" *ngIf="unitData$ | async as unit; else no_data">
+        <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header card-header-info">
+                            <div class="row">
+                                <div class="col-8">
+                                    <h4 class="card-title">unit Details</h4>
+                                    <p class="card-category">{{unit?.unit_name}}</p>
+                                </div>
+                                <div class="col-4 text-right" *ngIf="isAdmin$ | async">
+                                    <button mat-icon-button [matMenuTriggerFor]="menu" *robiPermission="['edit-unit', 'delete-unit']">
+                                        <mat-icon>more_vert</mat-icon>
+                                    </button>
+                                    <mat-menu #menu="matMenu">
+                                        <button mat-menu-item matTooltip="Edit unit." [matTooltipPosition]="'above'"
+                                                routerLink="edit" (click)="onSelected(unit)">
+                                            <mat-icon>edit</mat-icon>
+                                            <span>Edit unit</span>
+                                        </button>
+                                    </mat-menu>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <nav mat-tab-nav-bar>
+                                        <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive"
+                                           [routerLinkActiveOptions]="{exact: true}"
+                                           routerLink="/units/{{unitID}}">
+                                            <span class="nav-text"> Info </span></a>
+
+                                        <a mat-tab-link routerLinkActive #leases="routerLinkActive" [active]="leases.isActive"
+                                           [routerLink]="['leases']">
+                                            <span class="nav-text"> Leases </span></a>
+
+                                        <a mat-tab-link routerLinkActive #invoices="routerLinkActive" [active]="invoices.isActive"
+                                           [routerLink]="['invoices']">
+                                            <span class="nav-text"> Invoices </span></a>
+
+                                        <a mat-tab-link routerLinkActive #payments="routerLinkActive" [active]="payments.isActive"
+                                           [routerLink]="['payments']">
+                                            <span class="nav-text"> Payments </span></a>
+                                    </nav>
+                                    <router-outlet></router-outlet>
+
+
+
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header card-header-info">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <div class="card-category"> Total Leases: </div>
+                                                    <div>{{property?.leases_count}}</div>
+                                                </div>
+                                                <!-- <div class="col-4">
+                                                    <div class="card-category"> Occupied: </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="card-category text-danger"> Vacant: </div>
+                                                </div> -->
+                                            </div>
+
+
+                                        </div>
+                                        <div class="card-body">
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="card-category text-gray"> Name: </div>
+                                                    <div>{{unit?.unit_name}}</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="card-category text-gray"> Number: </div>
+                                                    <div>{{unit?.unit_number}}</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- <div class="card-category text-gray"> Location: </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>

@@ -43,6 +43,7 @@ export class AddTenantComponent implements OnInit  {
     tenant: TenantModel;
     deleteDialogRef: MatDialogRef<ConfirmationDialogComponent>;
     isAdmin$: Observable<boolean>;
+     myFiles: any;
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
                 private _formBuilder: FormBuilder,
@@ -59,6 +60,8 @@ export class AddTenantComponent implements OnInit  {
             first_name: [''],
             middle_name: [''],
             last_name: [''],
+            business_type: [''],
+            attach: [''],
             gender: [''],
             date_of_birth: [''],
             id_passport_number: [''],
@@ -72,7 +75,10 @@ export class AddTenantComponent implements OnInit  {
             postal_address: [''],
             physical_address: [''],
             password: [''],
-            password_confirmation: ['']
+            password_confirmation: [''],
+            tenant_national_establishment_no: [''],
+            tenant_representative: [''],
+            tenant_representative_id: [''],
         });
 
         this.nextOfKinFormGroup = this._formBuilder.group({
@@ -134,6 +140,8 @@ export class AddTenantComponent implements OnInit  {
             first_name: tenant?.first_name,
             middle_name: tenant?.middle_name,
             last_name: tenant?.last_name,
+            business_type: tenant?.business_type,
+            attach: tenant?.licence_attach,
             gender: tenant?.gender,
             date_of_birth: tenant?.date_of_birth,
             id_passport_number: tenant?.id_passport_number,
@@ -146,6 +154,11 @@ export class AddTenantComponent implements OnInit  {
             postal_code: tenant?.postal_code,
             postal_address: tenant?.postal_address,
             physical_address: tenant?.physical_address,
+
+            tenant_national_establishment_no: tenant?.tenant_national_establishment_no,
+            tenant_representative: tenant?.tenant_representative,
+            tenant_representative_id: tenant?.tenant_representative_id,
+
         });
     }
 
@@ -178,11 +191,16 @@ export class AddTenantComponent implements OnInit  {
      * Create member
      */
     create() {
+        const formData = new FormData();
+        formData.append('attach',this.myFiles)
+        formData.append('type','create')
+
         this.errorInForm.next(false);
         const tenantFields = {...this.personalFormGroup.value, ...this.nextOfKinFormGroup.value, ...this.employmentFormGroup.value};
         this.loader = true;
         this.tenantService.create(tenantFields)
             .subscribe((res) => {
+                    this.tenantService.uploadPhoto(formData).subscribe((data) => {})
                     this.loader = false;
                     this.notification.showNotification('success', 'Success !! New Tenant created.');
                     this.onSaveComplete();
@@ -219,6 +237,9 @@ export class AddTenantComponent implements OnInit  {
     }
 
     update() {
+        const formData = new FormData();
+        formData.append('attach',this.myFiles)
+        formData.append('type','update')
         const tenantFields = {...this.personalFormGroup.value, ...this.nextOfKinFormGroup.value, ...this.employmentFormGroup.value};
      //   tenantFields.id = this.tenantID;
         const body = Object.assign({}, this.tenant, tenantFields);
@@ -227,6 +248,8 @@ export class AddTenantComponent implements OnInit  {
 
         this.tenantService.update(body)
             .subscribe((data) => {
+                    this.tenantService.uploadPhoto(formData).subscribe((data) => {})
+
                     this.loader = false;
                     this.notification.showNotification('success', 'Success !! Tenant has been updated.');
                     this.onSaveComplete();
@@ -285,6 +308,9 @@ export class AddTenantComponent implements OnInit  {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }
                 });
+    }
+    onProfilePhotoSelect(event: any) {
+        this.myFiles = event.target.files[0];
     }
 }
 

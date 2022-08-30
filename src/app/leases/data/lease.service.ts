@@ -8,7 +8,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class LeaseService extends BaseService<LeaseModel> {
     private selectedLeaseSource = new BehaviorSubject<LeaseModel | null>(null);
     selectedLeaseChanges$ = this.selectedLeaseSource.asObservable();
-
+    changeSelectedProperty(selectedLease: LeaseModel | null ): void {
+        this.selectedLeaseSource.next(selectedLease);
+    }
     private  localHttpClient: HttpClient;
     constructor(httpClient: HttpClient) {
         super( httpClient, 'leases');
@@ -80,11 +82,11 @@ export class LeaseService extends BaseService<LeaseModel> {
 
     /**
      *
-     * @param file_path
+     * @param id
      */
-    public fetchPhoto(file_path: any): Observable<File> {
+    public fetchPhoto(id: any): Observable<File> {
         const imageUrl = 'fetch_photo';
         const url =  `${super.getResourceUrl()}/${imageUrl}`;
-        return this.localHttpClient.post<any>(url, {file_path}, { responseType: 'blob' as 'json'});
+        return this.localHttpClient.post<any>(url, {id}, { responseType: 'blob' as 'json'});
     }
 }

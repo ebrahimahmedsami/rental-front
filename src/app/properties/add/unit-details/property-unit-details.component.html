@@ -14,11 +14,11 @@
                                  (change)="onToggleChange(group.value)">
             <mat-button-toggle value="residential" aria-label="Text align left">
                 <mat-icon>home</mat-icon>
-                <span>Residential</span>
+                <span>سكني</span>
             </mat-button-toggle>
             <mat-button-toggle value="commercial" aria-label="Text align right">
                 <mat-icon>business</mat-icon>
-                <span>Commercial</span>
+                <span>تجاري</span>
             </mat-button-toggle>
         </mat-button-toggle-group>
     </div>
@@ -111,8 +111,8 @@
         </div>
         <div class="col-sm-6">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Square Foot</mat-label>
-                <input matInput type="number" min="0" formControlName="square_foot" placeholder="Square Foot">
+                <mat-label>Meter</mat-label>
+                <input matInput type="number" min="0" formControlName="square_foot" placeholder="Meter">
                 <mat-error align="start" *ngIf="formErrors?.square_foot" class="form__error">{{ formErrors.square_foot }}</mat-error>
             </mat-form-field>
         </div>

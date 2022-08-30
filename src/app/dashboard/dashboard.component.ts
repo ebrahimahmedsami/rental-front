@@ -116,6 +116,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       this.billingForm = this._formBuilder.group({
           period_id: [firstPeriod?.period_id, [Validators.required]]
       });
+      console.log(firstPeriod)
 
       this.pieChartData$ = of([
           firstPeriod?.amount_due,

@@ -26,7 +26,7 @@
                                     </button>
                                 </div>
                             </ng-container>
-                            <div class="col-7" [hidden]="!(isAdmin$ | async)">
+                            <div class="col-7">
                                 <mat-form-field class="search-form-field">
                                     <input matInput #search placeholder="{{ 'robi.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
                                     <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">

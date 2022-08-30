@@ -6,6 +6,7 @@ export class PropertyModel extends BaseModel {
     landlord_id: string;
     landlord: any;
     property_name: string;
+    description: string;
     property_photo: string;
     property_status: string;
     property_type_id: string;
@@ -33,4 +34,8 @@ export class PropertyModel extends BaseModel {
 
     agent_commission_value: string;
     agent_commission_type: string;
+    expenses: any;
+    revenue: any;
+    revenue_sum: number;
+    expenses_sum: number;
 }

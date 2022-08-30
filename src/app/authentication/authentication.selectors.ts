@@ -41,6 +41,7 @@ export const selectorUserScopes = createSelector(
     selectorUserAccessToken,
     access_token => {
         if (access_token) {
+            // console.log(jwt_decode(access_token))
             return jwt_decode(access_token)?.scopes;
         }
     }

@@ -25,6 +25,7 @@ import { PropertyModel } from '../../properties/models/property-model';
 import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import {fromArray} from "rxjs-compat/observable/fromArray";
 
 @Component({
     selector: 'robi-add-lease',
@@ -34,6 +35,7 @@ import { AuthenticationService } from '../../authentication/authentication.servi
 export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
     unitFields: FormArray;
+
     utilityDeposits: FormArray;
 
     unitValues = [];
@@ -51,6 +53,16 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
     isLinear = false;
 
+
+
+    //-----
+
+    casesDetails: FormGroup;
+    invoicingDetails: FormGroup;
+    termsDetails: FormGroup;
+    attachmentsDetails: FormGroup;
+    caseImgs:any = []
+    //-----
     leaseDetailsFormGroup: FormGroup;
     depositsFormGroup: FormGroup;
     tenantsFormGroup: FormGroup;
@@ -59,16 +71,26 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     utilityChargesFormGroup: FormGroup;
     paymentMethodsFormGroup: FormGroup;
     leaseSettingsFormGroup: FormGroup;
+    photoToUpload: any = [];
+    photoToUploadCases: FileList;
+    selected2:2;
+    listOfObjs:any = [{ name: 'Fixed Value', id: '1'}, { name: 'Percentage', id: '2'}];
+
 
     extraChargeTypes: any;
     lateFeeTypes: any;
     extraChargeFrequencies: any;
     extraCharges$: Observable<any>;
+    invoicing$: Observable<any>;
+    terms$: Observable<any>;
+    attach$: Observable<any>;
+    cases$: Observable<any>;
+    casesFiles$: Observable<any>;
 
     billingFrequencies: any;
     details = 'noooone';
 
-  //  leaseModes$: Observable<any>;
+    //  leaseModes$: Observable<any>;
     leaseTypes$: Observable<any>;
 
     leaseSettings$: Observable<any>;
@@ -78,6 +100,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     amenities: any;
     utilities: any;
     progress = 0;
+    showPhoto: any;
 
     public newTenant: string;
 
@@ -91,6 +114,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
     extraCharges: FormArray;
     lateFeeFields: FormArray;
+    invoicing: FormArray;
 
     paymentMethodFields: FormArray;
     utilityCharges: FormArray;
@@ -103,6 +127,14 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     isAdd = true;
     lease: LeaseModel;
     leaseID: string;
+    flag = true;
+    frqArray:any =  [];
+
+
+
+    myFiles:string [] = [];
+    newFiles = [];
+    myFilesCases:string [] = [];
 
     dueON = Array.from({length: (29 - 1)}, (v, k) => k + 1);
 
@@ -170,7 +202,14 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                 private leaseSettingService: LeaseSettingService,
                 private authenticationService: AuthenticationService,
                 private notification: NotificationService) {
-        this.lateFeeFrequencies = LATE_FEE_FREQUENCIES;
+        this.lateFeeFrequencies = [
+            { key: 'one_time', value: 'One Time' },
+            { key: 'daily', value: 'Daily' },
+            { key: 'weekly', value: 'Weekly' },
+            { key: 'bi_weekly', value: 'Bi-Weekly' },
+            { key: 'monthly', value: 'Monthly' },
+            { key: 'yearly', value: 'Yearly' },
+        ];
         this.newTenant = 'new';
         this.extraChargeTypes = EXTRA_CHARGE_TYPES;
         this.lateFeeTypes = LATE_FEE_TYPES;
@@ -180,11 +219,14 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.leaseDetailsFormGroup = this._formBuilder.group({
             lease_type_id: [''],
             property: [''],
+            propose: [''],
             units: [[]],
             start_date: [(new Date()).toISOString().substring(0, 10), [Validators.required]],
+            end_date: [(new Date()).toISOString().substring(0, 10), [Validators.required]],
             due_date: [''],
             rent_amount: [''],
-            due_on: [5]
+            due_on: [5],
+            files: [],
         });
 
         this.depositsFormGroup = this._formBuilder.group({
@@ -213,16 +255,163 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         });
 
         this.leaseSettingsFormGroup = this._formBuilder.group({
+            discount_type: [''],
+            discount_value: [''],
             generate_invoice_on: [''],
             next_period_billing: [''],
             skip_starting_period: [''],
+            auto_renw_activation: [''],
             waive_penalty: [''],
         });
+        this.casesDetails = this.createCaseForm('init')
+        // this.addNewCase()
+        this.invoicingDetails = this.createInvoicingForm('init')
+        this.addNewInvoicing()
+        this.termsDetails = this.createTermsForm('init')
+        this.addNewTerms()
+        this.attachmentsDetails = this.createAttachmentsForm('init')
+        this.addNewAttachments()
     }
 
     /**
      * Sets the initial value after the filteredTenants are loaded initially
      */
+
+    //Terms
+    createAttachmentsForm(itemType:string):FormGroup{
+        let formItem = this.fb.group({})
+        switch (itemType) {
+            case 'init':
+                formItem = this.fb.group(
+                    {
+                        attachmentNew: this.fb.array([])
+                    }
+                )
+                break
+            case 'addAttach':
+                formItem = this.fb.group({
+                    attach:[''],
+                    attach_name:[''],
+                    id:[''],
+                    attachment_name:[''],
+                })
+                break;
+        }
+        return  formItem
+    }
+    getAttachmentsFormGetter():FormArray{
+        return  this.attachmentsDetails.get('attachmentNew') as FormArray;
+
+    }
+    addNewAttachments() {
+        this.getAttachmentsFormGetter().push(
+            this.createAttachmentsForm('addAttach')
+        )
+    }
+    deleteAttachments(index){
+        this.onProfilePhotoSelect('',index,'delete')
+        this.getAttachmentsFormGetter().removeAt(index)
+    }
+    //Terms
+    //Terms
+    createTermsForm(itemType:string):FormGroup{
+        let formItem = this.fb.group({})
+        switch (itemType) {
+            case 'init':
+                formItem = this.fb.group(
+                    {
+                        termNew: this.fb.array([])
+                    }
+                )
+                break
+            case 'addTerm':
+                formItem = this.fb.group({
+                    term:['',Validators.required],
+                })
+                break;
+        }
+        return  formItem
+    }
+    getTermsFormGetter():FormArray{
+        return  this.termsDetails.get('termNew') as FormArray;
+    }
+    addNewTerms() {
+        this.getTermsFormGetter().push(
+            this.createTermsForm('addTerm')
+        )
+    }
+    deleteTerms(index){
+        this.getTermsFormGetter().removeAt(index)
+    }
+    //Terms
+    //Payments/Invoicing
+    createInvoicingForm(itemType:string):FormGroup{
+        let formItem = this.fb.group({})
+        switch (itemType) {
+            case 'init':
+                formItem = this.fb.group(
+                    {
+                        invoiceNew: this.fb.array([])
+                    }
+                )
+                break
+            case 'addInvoicing':
+                formItem = this.fb.group({
+                    start_date:['',Validators.required],
+                    end_date:['',Validators.required],
+                    amount:['',Validators.required],
+                    invoice_frequancy:['',Validators.required],
+                    in_advance:[''],
+                })
+                break;
+        }
+        return  formItem
+    }
+    getInvoicingFormGetter():FormArray{
+        return  this.invoicingDetails.get('invoiceNew') as FormArray;
+    }
+    addNewInvoicing() {
+        this.getInvoicingFormGetter().push(
+            this.createInvoicingForm('addInvoicing')
+        )
+    }
+    deleteInvoicing(index){
+        this.getInvoicingFormGetter().removeAt(index)
+    }
+    //Cases---
+    createCaseForm(itemType:string):FormGroup{
+        let formItem = this.fb.group({})
+        switch (itemType) {
+            case 'init':
+                formItem = this.fb.group(
+                    {
+                        caseNew: this.fb.array([])
+                    }
+                )
+                break
+            case 'addCase':
+                formItem = this.fb.group({
+                    caseName:['',Validators.required],
+                    fileName:['',Validators.required],
+                    case_date:['',Validators.required],
+                    case_status:['',Validators.required],
+                })
+                break;
+        }
+        return  formItem
+    }
+    getCaseFormGetter():FormArray{
+        return  this.casesDetails.get('caseNew') as FormArray;
+    }
+    addNewCase(){
+        this.getCaseFormGetter().push(
+            this.createCaseForm('addCase')
+        )
+    }
+    deleteCase(index){
+        this.getCaseFormGetter().removeAt(index)
+    }
+    //Cases----
     protected setTenantInitialValue() {
         this.filteredTenantsMulti
             .pipe(take(1), takeUntil(this._onDestroy))
@@ -280,14 +469,18 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.leaseDetailsFormGroup.get('property').disable();
         this.leaseDetailsFormGroup.get('units').disable();
         this.leaseDetailsFormGroup.get('start_date').disable();
+        this.leaseDetailsFormGroup.get('end_date').disable();
 
         this.leaseDetailsFormGroup.patchValue({
             property: lease?.property?.property_name + ' (' + lease?.property?.property_code + ')',
+            propose: lease?.propose,
             units: lease?.unit_names,
             lease_type_id: lease?.lease_type_id,
             start_date: lease?.start_date,
+            end_date: lease?.end_date,
             rent_amount: lease?.rent_amount,
             due_on: lease?.due_on,
+            files: lease?.files,
         });
 
         this.depositsFormGroup.get('rent_deposit').disable();
@@ -302,15 +495,23 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
         this.populateUtilityDeposits(lease);
         this.populateExtraCharges(lease);
+        this.populateInvoicing(lease);
+        this.populateTerms(lease);
+        this.populateAttach(lease);
+        this.populateCases(lease);
+        this.populateAttaches(lease);
         this.populateLateFees(lease);
         this.populateUtilityCharges(lease);
         this.populatePaymentMethods(lease);
 
         this.leaseSettingsFormGroup.get('skip_starting_period').disable();
         this.leaseSettingsFormGroup.patchValue({
+            discount_type: lease?.discount_type,
+            discount_value: lease?.discount_value,
             generate_invoice_on: lease?.generate_invoice_on,
             next_period_billing: lease?.next_period_billing,
             skip_starting_period: lease?.skip_starting_period,
+            auto_renw_activation: lease?.auto_renw_activation,
             waive_penalty: lease?.waive_penalty,
         });
     }
@@ -330,6 +531,10 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                         this.populateForm(data);
                     });
                 }
+                let test = this
+                setTimeout(function (){
+                    test.hideShowFreq()
+                },2000)
             });
         }
 
@@ -343,6 +548,8 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             this.paymentMethods$ = of(res?.payment_methods);
             this.utilities$ = of(res?.utilities);
             this.extraCharges$ = of(res?.extra_charges);
+            this.invoicing$ = of(res?.payment_invoicing);
+            this.terms$ = of(res?.terms);
         });
 
         // Tenants list
@@ -384,22 +591,44 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                 });
     }
 
+    onProfilePhotoSelect(event: any = '',attachIndex,type = 'not-delete') {
+
+        if (type === 'not-delete'){
+            this.myFiles.push(event.target.files[0]);
+            let fileName = event.target.files[0].name
+            let obj = this.newFiles.find(o => o.index === attachIndex);
+            if(obj != undefined && obj.index === attachIndex) {
+                this.newFiles.splice(this.newFiles.findIndex(a => a.index === attachIndex) , 1)
+            }
+            this.newFiles.push({"index": attachIndex, "file": fileName})
+        }else{
+            this.newFiles.splice(this.newFiles.findIndex(a => a.index === attachIndex) , 1)
+        }
+    }
+
+
+    onProfilePhotoSelectCases(event: any) {
+        this.myFilesCases.push(event.target.files[0]);
+    }
     /**
      *
      * @param setting
      */
     prePopulateLeaseSettingForm(setting: LeaseGeneralSettingModel) {
         this.leaseSettingsFormGroup.patchValue({
+            discount_type: setting?.discount_type,
+            discount_value: setting?.discount_value,
             generate_invoice_on: setting?.generate_invoice_on,
             next_period_billing: setting?.next_period_billing,
             skip_starting_period: setting?.skip_starting_period,
+            auto_renw_activation: setting?.auto_renw_activation,
             waive_penalty: setting?.waive_penalty
         });
     }
 
     ngAfterViewInit() {
         this.setTenantInitialValue();
-       // this.setUnitInitialValue();
+        // this.setUnitInitialValue();
     }
     ngOnDestroy() {
         this._onDestroy.next();
@@ -420,6 +649,106 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             this.extraChargesFormGroup.setControl('extraCharges', this.extraChargeFieldReplaceAll());
         });
     }
+    ///////////////////////////////// Invoicing //////////////////////////
+    populateInvoicing(lease) {
+        this.invoicing$ = of(lease?.payments_invoicing);
+        this.invoicing$.subscribe(res => {
+            this.invoicingDetails.setControl('invoiceNew',this.invoicingFieldReplaceAll());
+        });
+    }
+
+    invoicingFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.invoicing$.subscribe(charges => {
+            charges.forEach(charge => {
+                formArray.push(this.fb.group({
+                    start_date: charge?.start_date,
+                    end_date: charge?.end_date,
+                    amount: charge?.amount,
+                    invoice_frequancy: charge?.invoice_frequancy,
+                    in_advance: charge?.in_advance
+                }))
+            });
+        });
+        return formArray;
+    }
+    ///////////////////////////////// Invoicing //////////////////////////
+
+    ///////////////////////////////// Terms //////////////////////////
+    populateTerms(lease) {
+        this.terms$ = of(lease?.terms);
+        this.terms$.subscribe(res => {
+            this.termsDetails.setControl('termNew',this.termsFieldReplaceAll());
+        });
+    }
+
+    termsFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.terms$.subscribe(charges => {
+            charges.forEach(charge => {
+                formArray.push(this.fb.group({
+                    term: charge?.term,
+                }))
+            });
+        });
+        return formArray;
+    }
+    ///////////////////////////////// Terms //////////////////////////
+
+    ///////////////////////////////// Attachments //////////////////////////
+    populateAttach(lease) {
+        this.attach$ = of(lease?.attaches);
+    }
+    attachesFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.attach$.subscribe(charges => {
+            charges.forEach(charge => {
+                formArray.push(this.fb.group({
+                    attach: '',
+                    attach_name: charge?.file_name,
+                    id: charge?.id,
+                    attachment_name: charge?.attachment_name,
+                }))
+            });
+        });
+        return formArray;
+    }
+    populateAttaches(lease) {
+        // console.log(lease)
+        this.attach$ = of(lease?.attaches);
+        this.attach$.subscribe(res => {
+            this.attachmentsDetails.setControl('attachmentNew',this.attachesFieldReplaceAll());
+        });
+    }
+
+    ///////////////////////////////// Attachments //////////////////////////
+
+    ///////////////////////////////// Cases //////////////////////////
+    populateCases(lease) {
+        this.cases$ = of(lease?.cases);
+        this.cases$.subscribe(res => {
+            this.casesDetails.setControl('caseNew',this.casesFieldReplaceAll());
+        });
+    }
+
+    casesFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.cases$.subscribe(charges => {
+            charges.forEach(charge => {
+                formArray.push(this.fb.group({
+                    caseName: charge?.name,
+                    fileName: '',
+                    case_date: charge?.date,
+                    case_status: charge?.status,
+                    id: charge?.id,
+                }))
+            });
+        });
+        return formArray;
+    }
+    ///////////////////////////////// Cases //////////////////////////
+
+
     populateLateFees(lease) {
         this.lateFees$ = of(lease?.late_fees);
         this.lateFees$.subscribe(res => {
@@ -462,10 +791,10 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             });
 
         if (Array.isArray(property?.extra_charges) && property?.extra_charges?.length !== 0) {
-               this.extraCharges$ = of(property?.extra_charges);
-                this.extraCharges$.subscribe(charges => {
-                    this.extraChargesFormGroup.setControl('extraCharges', this.extraChargeFieldReplaceAll());
-                });
+            this.extraCharges$ = of(property?.extra_charges);
+            this.extraCharges$.subscribe(charges => {
+                this.extraChargesFormGroup.setControl('extraCharges', this.extraChargeFieldReplaceAll());
+            });
         }
 
         if (Array.isArray(property?.late_fees) && property?.late_fees?.length !== 0) {
@@ -509,7 +838,10 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                     extra_charge_id: charge?.id,
                     extra_charge_value: charge?.pivot?.extra_charge_value,
                     extra_charge_type: charge?.pivot?.extra_charge_type,
-                    extra_charge_frequency: charge?.pivot?.extra_charge_frequency
+                    extra_charge_frequency: charge?.pivot?.extra_charge_frequency ,
+                    extra_charge_start_date: charge?.pivot?.start_date ,
+                    extra_charge_end_date: charge?.pivot?.end_date
+
                 }))
             });
         });
@@ -525,8 +857,32 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             extra_charge_id: [data?.extra_charge_id],
             extra_charge_value: [data?.extra_charge_value],
             extra_charge_type: [data?.extra_charge_type],
-            extra_charge_frequency: [data?.extra_charge_frequency]
+            extra_charge_frequency: [data?.extra_charge_frequency],
+            extra_charge_start_date: [data?.extra_charge_frequency],
+            extra_charge_end_date: [data?.extra_charge_frequency]
         });
+    }
+    public hideShowFreq(event = '',i = 0){
+        if (!this.isAdd && this.flag){
+            this.extraChargeFieldAll.value.forEach((val,index) => {
+                if (val.extra_charge_frequency == 'period_to_period'){
+                    this.frqArray.push('data_'+index);
+                }
+            })
+            this.flag = false
+        }else{
+
+        }
+
+
+        if (event == 'period_to_period'){
+            this.frqArray.push('data_'+i);
+        }else{
+            const index = this.frqArray.indexOf('data_'+i);
+            if (index > -1) {
+                this.frqArray.splice(index, 1);
+            }
+        }
     }
 
     /**
@@ -555,6 +911,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.extraCharges = this.extraChargesFormGroup.get('extraCharges') as FormArray;
         const holder = [];
         holder.push(this.extraCharges.value[i])
+        // console.log(holder)
         this.extraChargeFieldAdd(...holder);
     }
     /* End extra charge section*/
@@ -646,6 +1003,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             utility_id: [data?.utility_id],
             utility_unit_cost: [data?.utility_unit_cost],
             utility_base_fee: [data?.utility_base_fee],
+            utility_frequancy: [data?.utility_frequancy],
         });
     }
 
@@ -660,6 +1018,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                     utility_id: charge?.id,
                     utility_unit_cost: charge?.pivot?.utility_unit_cost,
                     utility_base_fee: charge?.pivot?.utility_base_fee,
+                    utility_frequancy: charge?.pivot?.utility_frequancy,
                 }))
             });
         });
@@ -767,6 +1126,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         return <FormArray>this.depositsFormGroup.get('utilityDeposits');
     }
 
+
     /**
      * Generate fields for a data row
      */
@@ -798,6 +1158,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.utilityDeposits = this.depositsFormGroup.get('utilityDeposits') as FormArray;
         this.utilityDeposits.push(this.utilityDepositFieldCreate(data));
     }
+
 
     /**
      * remove an existing data row
@@ -841,12 +1202,32 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     createOrUpdate() {
         this.isAdd ? this.create() : this.update();
     }
+    createImageFromBlob(image: Blob) {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+            this.showPhoto = of(reader.result);
+        }, false);
 
+        if (image) {
+            reader.readAsDataURL(image);
+        }
+    }
     /**
      * Create member
      */
     create() {
         this.errorInForm.next(false);
+
+        const formData = new FormData();
+        for (var i = 0; i < this.myFiles.length; i++) {
+            formData.append("file_attach[]", this.myFiles[i]);
+        }
+
+        for (var i = 0; i < this.myFilesCases.length; i++) {
+            formData.append("file_case[]", this.myFilesCases[i]);
+        }
+        formData.append("type", 'create');
+
         const lease = {
             ...this.leaseDetailsFormGroup.value,
             ...this.depositsFormGroup.value,
@@ -855,13 +1236,22 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             ...this.lateFeesFormGroup.value,
             ...this.utilityChargesFormGroup.value,
             ...this.paymentMethodsFormGroup.value,
-            ...this.leaseSettingsFormGroup.value
+            ...this.leaseSettingsFormGroup.value,
+            ...this.casesDetails.value,
+            ...this.invoicingDetails.value,
+            ...this.termsDetails.value,
+            ...this.attachmentsDetails.value
         };
+
+
         const body = Object.assign({}, this.lease, lease);
         body.property_id = this.propertyID;
         body.landlord_id = this.landlordID;
         this.loader = true;
         this.leaseService.create(body).subscribe((data) => {
+
+                this.leaseService.uploadPhoto(formData).subscribe((data) => {})
+
                 this.loader = false;
                 this.notification.showNotification('success', 'Success !! Lease created.');
                 this.onSaveComplete();
@@ -928,27 +1318,44 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             ...this.lateFeesFormGroup.value,
             ...this.utilityChargesFormGroup.value,
             ...this.paymentMethodsFormGroup.value,
-            ...this.leaseSettingsFormGroup.value
+            ...this.leaseSettingsFormGroup.value,
+            ...this.invoicingDetails.value,
+            ...this.termsDetails.value,
+            ...this.casesDetails.value,
+            ...this.attachmentsDetails.value
         };
         const body = Object.assign({}, this.lease, lease);
         body.property_id = this.propertyID;
         body.landlord_id = this.landlordID;
-       /* delete body.property;
-        delete body.units;
-        delete body.utility_deposits;
-        delete body.late_fees;
-        delete body.extra_charges;
-        delete body.payment_methods;
-        delete body.utility_charges;
-        delete body.status;
-        delete body.utilityDeposits;
-        delete body.tenants;*/
+        /* delete body.property;
+         delete body.units;
+         delete body.utility_deposits;
+         delete body.late_fees;
+         delete body.extra_charges;
+         delete body.payment_methods;
+         delete body.utility_charges;
+         delete body.status;
+         delete body.utilityDeposits;
+         delete body.tenants;*/
 
         this.loader = true;
         this.errorInForm.next(false);
 
+        const formData = new FormData();
+        for (var i = 0; i < this.myFiles.length; i++) {
+            formData.append("file_attach[]", this.myFiles[i]);
+        }
+
+        for (var i = 0; i < this.myFilesCases.length; i++) {
+            formData.append("file_case[]", this.myFilesCases[i]);
+        }
+        formData.append("type", 'update');
+
+
         this.leaseService.update(body)
             .subscribe((res) => {
+                    this.leaseService.uploadPhoto(formData).subscribe((data) => {})
+
                     this.loader = false;
                     this.notification.showNotification('success', 'Success !! Lease has been updated.');
                     this.onSaveComplete();

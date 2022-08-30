@@ -28,4 +28,10 @@ export class UnitService extends BaseService<UnitModel> {
         const url =  `${super.getResourceUrl()}/${endpoint}`;
         return this.localHttpClient.post<any>(url, {filter: item});
     }
+
+    info(item: any): Observable<any> {
+        const endpoint = 'info';
+        const url =  `${super.getResourceUrl()}/${endpoint}`;
+        return this.localHttpClient.post<any>(url, {filter: item});
+    }
 }

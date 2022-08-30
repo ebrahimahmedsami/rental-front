@@ -13,6 +13,9 @@ import { PropertyLeaseComponent } from './view/lease/property-lease.component';
 import { PropertyInvoiceComponent } from './view/invoice/property-invoice.component';
 import { PropertyNoticeComponent } from './view/notice/property-notice.component';
 import { PropertyUnitComponent } from './view/unit/property-unit.component';
+import { UnitInfoComponent } from './view/unit/unit-info/unit-info.component';
+import { StatusComponent } from './view/status/status.component';
+import {ChartsModule} from "ng2-charts";
 
 @NgModule({
     imports: [
@@ -20,7 +23,8 @@ import { PropertyUnitComponent } from './view/unit/property-unit.component';
         PropertyRoutingModule,
         NgxMatSelectSearchModule,
         NgxChartsModule,
-        ChartistModule
+        ChartistModule,
+        ChartsModule
     ],
     declarations: [
         PropertyComponent,
@@ -31,7 +35,9 @@ import { PropertyUnitComponent } from './view/unit/property-unit.component';
         PropertyLeaseComponent,
         PropertyInvoiceComponent,
         PropertyNoticeComponent,
-        PropertyUnitComponent
+        PropertyUnitComponent,
+        UnitInfoComponent,
+        StatusComponent
     ]
 })
 

@@ -13,9 +13,9 @@ export class AppComponent {
   loading = true;
 
   constructor(translate: TranslateService, private router: Router) {
-    translate.addLangs(['en', 'klingon']);
+    // translate.addLangs(['en', 'klingon']);
     translate.setDefaultLang('en');
-    translate.use('en');
+    translate.use(localStorage.getItem('lang') || 'en');
 
     router.events.subscribe(event => {
       if (event instanceof NavigationStart) {

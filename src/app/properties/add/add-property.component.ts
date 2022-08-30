@@ -63,6 +63,9 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
     lateFeesFormGroup: FormGroup;
 
     propertyTypes$: Observable<any>;
+    property$: Observable<any>;
+    certificates$: Observable<any>;
+
 
     utilities$: Observable<any>;
     paymentMethods$: Observable<any>;
@@ -81,6 +84,10 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
     extraCharges$: any;
     lateFees$: any;
     propertySetting: any;
+    frqArray:any =  [];
+    casesDetails: FormGroup;
+    certificateDetails: FormGroup;
+
 
     /** control for filter for server side. */
     public landlordServerSideFilteringCtrl: FormControl = new FormControl();
@@ -97,11 +104,14 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
     landlordsFiltered$: Observable<any>;
 
     isAdd = true;
+    flag = true;
     propertyID: string;
     property: PropertyModel;
 
     deleteDialogRef: MatDialogRef<ConfirmationDialogComponent>;
     isAdmin$: Observable<boolean>;
+    myFilesCases:string [] = [];
+    myFilesCertificates:string [] = [];
     constructor(private fb: FormBuilder,
                 private propertyExtraDataService: PropertyExtraDataService,
                 private dialog: MatDialog,
@@ -134,6 +144,7 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
                 property_name: ['', [Validators.required,
                     Validators.minLength(2)]],
                 location: [''],
+                description: [''],
                 property_code: ['', [Validators.required,
                     Validators.minLength(2)]],
                 property_type_id: ['', [Validators.required,
@@ -158,7 +169,82 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
             this.utilitiesFormGroup = this._formBuilder.group({
                 utilityFields: this.fb.array([ this.utilityFieldCreate() ])
             });
+        this.casesDetails = this.createCaseForm('init')
+        this.certificateDetails = this.createCertificateForm('init')
+
     }
+
+    //Cases---
+    createCertificateForm(itemType:string):FormGroup{
+        let formItem = this.fb.group({})
+        switch (itemType) {
+            case 'init':
+                formItem = this.fb.group(
+                    {
+                        certificateNew: this.fb.array([])
+                    }
+                )
+                break
+            case 'addCertificate':
+                formItem = this.fb.group({
+                    name:['',Validators.required],
+                    fileName:['',Validators.required],
+                    date_from:['',Validators.required],
+                    date_to:['',Validators.required],
+                    cost:['',Validators.required],
+                    status:['',Validators.required],
+                })
+                break;
+        }
+        return  formItem
+    }
+    getCertificateFormGetter():FormArray{
+        return  this.certificateDetails.get('certificateNew') as FormArray;
+    }
+    addNewCertificate(){
+        this.getCertificateFormGetter().push(
+            this.createCertificateForm('addCertificate')
+        )
+    }
+    deleteCertificate(index){
+        this.getCertificateFormGetter().removeAt(index)
+    }
+    //Certificate----
+
+    //Cases---
+    createCaseForm(itemType:string):FormGroup{
+        let formItem = this.fb.group({})
+        switch (itemType) {
+            case 'init':
+                formItem = this.fb.group(
+                    {
+                        mainNew: this.fb.array([])
+                    }
+                )
+                break
+            case 'addCase':
+                formItem = this.fb.group({
+                    name:['',Validators.required],
+                    fileName:['',Validators.required],
+                    date:['',Validators.required],
+                    cost:['',Validators.required],
+                })
+                break;
+        }
+        return  formItem
+    }
+    getCaseFormGetter():FormArray{
+        return  this.casesDetails.get('mainNew') as FormArray;
+    }
+    addNewCase(){
+        this.getCaseFormGetter().push(
+            this.createCaseForm('addCase')
+        )
+    }
+    deleteCase(index){
+        this.getCaseFormGetter().removeAt(index)
+    }
+    //Cases----
 
     populatePropertyDetailsForm(property) {
         this.propertyDetailsFormGroup.get('total_units').disable();
@@ -168,6 +254,7 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
             total_units: property?.total_units,
             landlord_id: property?.landlord?.first_name + ' ' + property?.landlord?.last_name,
             property_name: property?.property_name,
+            description: property?.description,
             location: property?.location,
             property_code: property?.property_code,
             property_type_id: property?.property_type_id,
@@ -213,12 +300,15 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
         this.populateExtraChargesForm(property);
         this.populateLateFeesForm(property);
         this.populateUtilitiesForm(property);
+        this.populateMaintenance(property);
+        this.populateCertificate(property);
     }
 
     ngOnInit() {
         this.propertyID = this.route.snapshot.paramMap.get('id');
         if (this.propertyID) {
             this.isAdd = false;
+
 
             this.propertyService.selectedPropertyChanges$.subscribe(property => {
                 if (property) {
@@ -232,6 +322,11 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
                         this.populateForm(data);
                     });
                 }
+                let test = this
+                setTimeout(function (){
+                    test.hideShowFreq()
+                },2000)
+
             });
         }
 
@@ -247,6 +342,7 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
             this.extraCharges$ = of(res?.extra_charges);
           //  this.amenities$ = of(res?.amenities);
         });
+
 
         // Amenities list
         this.amenities$ = this.amenityService.list(['amenity_name ', 'amenity_display_name ']);
@@ -283,6 +379,7 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
                 error => {
                     this.searching = false;
                 });
+
     }
 
 
@@ -364,11 +461,36 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
                     extra_charge_value: extraCharge?.pivot?.extra_charge_value,
                     extra_charge_type: extraCharge?.pivot?.extra_charge_type,
                     extra_charge_frequency: extraCharge?.pivot?.extra_charge_frequency,
+                    end_date: extraCharge?.pivot?.end_date,
+                    start_date: extraCharge?.pivot?.start_date,
                 }))
             });
         });
         return formArray;
     }
+
+
+    public hideShowFreq(event = '',i = 0){
+        if (!this.isAdd && this.flag){
+            this.extraChargeFieldsAll.value.forEach((val,index) => {
+                if (val.extra_charge_frequency == 'period_to_period'){
+                    this.frqArray.push('data_'+index);
+                }
+            })
+            this.flag = false
+        }
+
+        if (event == 'period_to_period'){
+            this.frqArray.push('data_'+i);
+        }else{
+            const index = this.frqArray.indexOf('data_'+i);
+            if (index > -1) {
+                this.frqArray.splice(index, 1);
+            }
+        }
+    }
+
+
 
     /**
      * Generate fields for a data row
@@ -378,7 +500,9 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
             extra_charge_id: [data?.extra_charge_id],
             extra_charge_value: [data?.extra_charge_value],
             extra_charge_type: [data?.extra_charge_type],
-            extra_charge_frequency: [data?.extra_charge_frequency]
+            extra_charge_frequency: [data?.extra_charge_frequency],
+            end_date: [data?.end_date],
+            start_date: [data?.start_date]
         });
     }
 
@@ -665,20 +789,92 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
         });
     }
 
+    ///////////////////////////////// Maintenance //////////////////////////
+    populateMaintenance(property) {
+        this.property$ = of(property?.property_maintenance);
+        this.property$.subscribe(res => {
+            this.casesDetails.setControl('mainNew',this.maintenanceFieldReplaceAll());
+        });
+    }
+    maintenanceFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.property$.subscribe(charges => {
+            charges.forEach(charge => {
+                formArray.push(this.fb.group({
+                    name: charge?.name,
+                    fileName: '',
+                    cost: charge?.cost,
+                    date: charge?.date,
+                    id: charge?.id,
+                }))
+            });
+        });
+        return formArray;
+    }
+    ///////////////////////////////// Maintenance //////////////////////////
+
+    ///////////////////////////////// Certificate //////////////////////////
+    populateCertificate(property) {
+        this.certificates$ = of(property?.property_certificate);
+        this.certificates$.subscribe(res => {
+            this.certificateDetails.setControl('certificateNew',this.certificateFieldReplaceAll());
+        });
+    }
+    certificateFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.certificates$.subscribe(charges => {
+            charges.forEach(charge => {
+                formArray.push(this.fb.group({
+                    name: charge?.name,
+                    fileName: '',
+                    cost: charge?.cost,
+                    date_from: charge?.date_from,
+                    date_to: charge?.date_to,
+                    status: charge?.status,
+                    id: charge?.id,
+                }))
+            });
+        });
+        return formArray;
+    }
+    ///////////////////////////////// Certificate //////////////////////////
+
     createOrUpdate() {
         this.isAdd ? this.create() : this.update();
+    }
+
+    onProfilePhotoSelectCases(event: any) {
+        this.myFilesCases.push(event.target.files[0]);
+    }
+
+    onProfilePhotoSelectCertificates(event: any) {
+        this.myFilesCertificates.push(event.target.files[0]);
     }
 
      create() {
         this.errorInForm.next(false);
         const data = {...this.propertyDetailsFormGroup.value, ...this.paymentsFormGroup.value,
-            ...this.extraChargesFormGroup.value, ...this.utilitiesFormGroup.value, ...this.lateFeesFormGroup.value};
+            ...this.extraChargesFormGroup.value, ...this.utilitiesFormGroup.value, ...this.lateFeesFormGroup.value,
+            ...this.casesDetails.value,...this.certificateDetails.value
+        };
+
+         const formData = new FormData();
+         for (var i = 0; i < this.myFilesCases.length; i++) {
+             formData.append("file_maintenances[]", this.myFilesCases[i]);
+         }
+         for (var i = 0; i < this.myFilesCertificates.length; i++) {
+             formData.append("file_certificates[]", this.myFilesCertificates[i]);
+         }
+
+         formData.append("type", 'create');
+
 
         const body = Object.assign({}, this.property, data);
         body.units = this.unitValues;
         this.loader = true;
         this.propertyService.create(body)
             .subscribe((res) => {
+                this.propertyService.uploadPhoto(formData).subscribe((data) => {})
                     this.loader = false;
                     this.notification.showNotification('success', 'Success !! New Property created.');
                     this.onSaveComplete();
@@ -724,13 +920,27 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
 
     update() {
         const data = {...this.propertyDetailsFormGroup.value, ...this.paymentsFormGroup.value,
-            ...this.extraChargesFormGroup.value, ...this.utilitiesFormGroup.value, ...this.lateFeesFormGroup.value};
+            ...this.extraChargesFormGroup.value, ...this.utilitiesFormGroup.value, ...this.lateFeesFormGroup.value,
+            ...this.casesDetails.value,...this.certificateDetails.value};
         const body = Object.assign({}, this.property, data);
         this.loader = true;
         this.errorInForm.next(false);
 
+        const formData = new FormData();
+
+
+        for (var i = 0; i < this.myFilesCases.length; i++) {
+            formData.append("file_maintenances[]", this.myFilesCases[i]);
+        }
+        for (var i = 0; i < this.myFilesCertificates.length; i++) {
+            formData.append("file_certificates[]", this.myFilesCertificates[i]);
+        }
+        formData.append("type", 'update');
+
         this.propertyService.update(body)
             .subscribe((res) => {
+                    this.propertyService.uploadPhoto(formData).subscribe((data) => {})
+
                     this.loader = false;
                     this.notification.showNotification('success', 'Success !! Property has been updated.');
                     this.onSaveComplete();

@@ -7,6 +7,8 @@ import { PropertyLeaseComponent } from './view/lease/property-lease.component';
 import { PropertyInvoiceComponent } from './view/invoice/property-invoice.component';
 import { PropertyNoticeComponent } from './view/notice/property-notice.component';
 import { PropertyUnitComponent } from './view/unit/property-unit.component';
+import { UnitInfoComponent } from './view/unit/unit-info/unit-info.component';
+import { StatusComponent } from './view/status/status.component';
 
 export const ROUTES: Routes = [
     {
@@ -18,10 +20,15 @@ export const ROUTES: Routes = [
         component: AddPropertyComponent
     },
     {
+        path: 'unit-info',
+        component: UnitInfoComponent
+    },
+    {
         path: ':id',
         component: ViewPropertyComponent,
         children: [
             { path: '', component: ViewPropertyGeneralComponent },
+            { path: 'status', component: StatusComponent },
             { path: 'units', component: PropertyUnitComponent },
             { path: 'leases', component: PropertyLeaseComponent },
             { path: 'invoices', component: PropertyInvoiceComponent },

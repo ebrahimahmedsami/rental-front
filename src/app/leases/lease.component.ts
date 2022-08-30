@@ -32,6 +32,7 @@ export class LeaseComponent implements OnInit, AfterViewInit {
         'unit_names',
         'rent_amount',
         'start_date',
+        'end_date',
         'billed_on',
         'status',
         'statement',
@@ -59,7 +60,7 @@ export class LeaseComponent implements OnInit, AfterViewInit {
     activeUser: any;
     isAdmin$: Observable<boolean>;
     isTenant: any;
-    isLandlord: any;
+    isLandlord$: Observable<boolean>;
     constructor(private landlordService: LandlordService,
                 private tenantService: TenantService,
                 private userService: UserSettingService,
@@ -70,7 +71,7 @@ export class LeaseComponent implements OnInit, AfterViewInit {
         this.activeUser = this.userService.getActiveUser();
         this.isAdmin$ = this.authenticationService.isAdmin();
         this.isTenant = this.authenticationService.isTenant();
-        this.isLandlord = this.authenticationService.isLandlord();
+        this.isLandlord$ = this.authenticationService.isLandlord();
     }
 
     /**
@@ -255,7 +256,7 @@ export class LeaseComponent implements OnInit, AfterViewInit {
             id: id,
             isLease: true,
         };
-        dialogConfig.width = '600px';
+        dialogConfig.width = '900px';
         this.dialog.open(PdfStatementComponent, dialogConfig);
     }
 }

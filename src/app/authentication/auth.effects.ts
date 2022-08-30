@@ -18,7 +18,6 @@ export class AuthEffects {
           this.actions$.pipe(
               ofType(AuthActions.actionLogin),
               tap((action) => {
-                  console.log('login');
                       this.localStorageService.setItem(AUTH_KEY, action.user);
               }
 
@@ -26,20 +25,6 @@ export class AuthEffects {
           ),
       { dispatch: false }
   );
-
-   /* settings = createEffect(
-        () =>
-            this.actions$.pipe(
-                ofType(AuthActions.actionSettings),
-                tap((action) => {
-                    console.log('xxxx');
-                        this.localStorageService.removeItem(AUTH_KEY);
-                      //  this.localStorageService.setItem(AUTH_KEY, action.user);
-                    }
-                )
-            ),
-        { dispatch: false }
-    );*/
 
   logout = createEffect(
       () =>
@@ -56,38 +41,12 @@ export class AuthEffects {
     @Effect()
     init$ = defer(() => {
         const user = this.localStorageService.getItem(AUTH_KEY);
-       // console.log('authData', user);
         if (user) {
             return of(AuthActions.actionLogin({user: user}));
         } else {
             // return of(new Logout());
         }
     });
-
-/*  @Effect({dispatch: false})
-  login$ = this.actions$.pipe(
-      ofType<Login>(AuthActionTypes.LoginAction),
-      tap(action => localStorage.setItem(this.storageKey, JSON.stringify(action.payload.user)))
-  );
-
-  @Effect({dispatch: false})
-  logout$ = this.actions$.pipe(
-      ofType<Logout>(AuthActionTypes.LogoutAction),
-      tap(() => {
-        localStorage.removeItem(this.storageKey);
-        this.router.navigateByUrl('/login');
-      })
-  );
-
-  @Effect()
-  init$ = defer(() => {
-      const userData = JSON.parse(localStorage.getItem(this.storageKey));
-      if (userData) {
-        return of(new Login({user: userData}));
-      } else {
-       // return of(new Logout());
-      }
-  });*/
 
   constructor(
       private actions$: Actions,

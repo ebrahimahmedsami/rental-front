@@ -18,7 +18,7 @@
                     <div class="card-body">
                         <div class="row search-form-section">
                             <ng-container *robiPermission="['create-lease']">
-                                <div class="col-5" *ngIf="isAdmin$ | async">
+                                <div class="col-5" *ngIf="(isAdmin$ | async) || (isLandlord$ | async)">
                                     <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
                                             [routerLink]="['create']">
                                         <mat-icon>add</mat-icon>Add Lease
@@ -42,7 +42,14 @@
                                     <mat-header-cell *matHeaderCellDef mat-sort-header> Lease Number </mat-header-cell>
                                     <mat-cell *matCellDef="let row">
                                         <button mat-flat-button routerLink="{{row.id}}" (click)="onSelected(row)">
-                                            <span class="link">{{row.lease_number}}</span>
+                                            <span style="display: grid" class="link">
+                                                {{row.lease_units_numbers}}
+<!--                                                <span *ngIf="row.units.length">-->
+<!--                                                   <span *ngFor="let unit of row.units">-->
+<!--                                                      - {{unit.unit_number}}-->
+<!--                                                   </span>-->
+<!--                                                </span>-->
+                                            </span>
                                         </button>
                                     </mat-cell>
                                 </ng-container>
@@ -65,6 +72,10 @@
                                 <ng-container matColumnDef="start_date">
                                     <mat-header-cell *matHeaderCellDef mat-sort-header> Start Date </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.start_date}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="end_date">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header> End Date </mat-header-cell>
+                                    <mat-cell *matCellDef="let row"> {{row.end_date ?? '-'}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="billed_on">

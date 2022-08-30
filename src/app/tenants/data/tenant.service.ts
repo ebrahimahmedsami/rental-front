@@ -31,12 +31,21 @@ export class TenantService extends BaseService<TenantModel> {
         const url =  `${super.getResourceUrl()}/${imageUrl}`;
         return this.localHttpClient.post<any>(url, {filter: item});
     }
-
+    search_unit(item: any,unitID: any): Observable<any> {
+        const imageUrl = 'search';
+        const url =  `${super.getResourceUrl()}/${imageUrl}`;
+        return this.localHttpClient.post<any>(url, {filter: item,unitID: unitID});
+    }
     /**
      * Create a new resource
      * @param item
      */
     public create(item: any): Observable<TenantModel> {
         return this.localHttpClient.post<any>(super.getResourceUrl(), item);
+    }
+
+    public uploadPhoto(item: any): any {
+        const itemUrl = 'tenant_upload_attach';
+        return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
 }

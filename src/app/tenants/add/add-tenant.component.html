@@ -51,6 +51,25 @@
                                                 </div>
 
                                         <div class="row">
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Business Type</mat-label>
+                                                    <input matInput formControlName="business_type" placeholder="Last Name">
+                                                    <mat-error align="start" *ngIf="formErrors?.business_type" class="form__error">{{ formErrors.last_name }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                                                <div>
+                                                    <input type="file" #logoFileInput  class="file-input" (change)="onProfilePhotoSelect($event)">
+                                                    <button style="height: 50px;width: 100%;" mat-button class="mat-raised-button" (click)="logoFileInput.click()">
+                                                        <i class="material-icons">attachment</i>
+                                                        Licence Attachment <span *ngIf="personalFormGroup.value.attach" class="text-danger">({{ personalFormGroup.value.attach}})</span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
                                             <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
                                                 <mat-form-field class="full-width" color="primary" appearance="outline">
                                                     <mat-label>Last Name</mat-label>
@@ -158,6 +177,34 @@
                                                 </mat-form-field>
                                             </div>
                                         </div>
+
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>National Establishment No.</mat-label>
+                                                    <input matInput formControlName="tenant_national_establishment_no" placeholder="National Establishment No.">
+                                                    <mat-error align="start" *ngIf="formErrors?.tenant_national_establishment_no" class="form__error">{{ formErrors.tenant_national_establishment_no }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Representative</mat-label>
+                                                    <input matInput formControlName="tenant_representative" placeholder="Representative">
+                                                    <mat-error align="start" *ngIf="formErrors?.tenant_representative" class="form__error">{{ formErrors.tenant_representative }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Representative ID</mat-label>
+                                                    <input matInput formControlName="tenant_representative_id" placeholder="Representative ID">
+                                                    <mat-error align="start" *ngIf="formErrors?.tenant_representative_id" class="form__error">{{ formErrors.tenant_representative_id }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+
+
 
                                         <div class="row">
                                             <div class="col-md-6">

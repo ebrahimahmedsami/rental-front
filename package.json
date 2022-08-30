@@ -3,12 +3,13 @@
   "version": "2.4.0",
   "license": "MIT",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
+    "ng": "node --max_old_space_size=4096 ./node_modules/.bin/ng",
+    "start": "ng serve --o",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "build:production": "node --version",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && ng serve -o"
   },
   "engines": {
@@ -36,8 +37,8 @@
     "@ngrx/router-store": "^12.4.0",
     "@ngrx/store": "^12.4.0",
     "@ngrx/store-devtools": "^12.4.0",
-    "@ngx-translate/core": "^12.1.2",
-    "@ngx-translate/http-loader": "^4.0.0",
+    "@ngx-translate/core": "^13.0.0",
+    "@ngx-translate/http-loader": "^6.0.0",
     "@swimlane/ngx-charts": "^17.0.1",
     "ajv": "6.12.2",
     "angular2-multiselect-dropdown": "^4.6.10",

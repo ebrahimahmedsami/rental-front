@@ -34,6 +34,9 @@ export class LoginComponent implements OnInit {
     }
 
     ngOnInit() {
+        let lang = localStorage.getItem('lang');
+        if (!lang)
+            localStorage.setItem('lang','en')
         this.theme$ = this.store.pipe(select(selectEffectiveTheme));
 
         this.store.dispatch(AuthenticationActions.actionLogout());

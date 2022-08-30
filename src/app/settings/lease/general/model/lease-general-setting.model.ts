@@ -11,5 +11,8 @@ export class LeaseGeneralSettingModel extends BaseModel {
     show_payment_method_on_invoice: string;
     next_period_billing: boolean;
     skip_starting_period: boolean;
+    auto_renw_activation: boolean;
     waive_penalty: boolean;
+    discount_value: any;
+    discount_type: any;
 }

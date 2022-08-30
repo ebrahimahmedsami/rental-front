@@ -55,7 +55,7 @@
         <li routerLinkActive="active" class="nav-item">
             <a class="nav-link pointer" *ngIf="!loading" (click)="logout()">
                 <i class="material-icons">power_settings_new</i>
-                <p>Logout</p>
+                <p>{{'sidebar.logout' | translate}}</p>
             </a>
             <a class="nav-link" *ngIf="loading">
                 <i class="material-icons">clear_all</i>

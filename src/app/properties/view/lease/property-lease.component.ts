@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import {fromEvent, merge} from 'rxjs';
+import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
 import { LeaseDataSource } from '../../../leases/data/lease-data.source';
 import { LeaseService } from '../../../leases/data/lease.service';
@@ -75,7 +75,7 @@ export class PropertyLeaseComponent implements OnInit, AfterViewInit {
     loadData() {
         this.leaseDataSource.loadNested(
             this.propertyService.nestedLeasesUrl(this.propertyID),
-            '',
+            this.search.nativeElement.value,
             (this.paginator.pageIndex + 1),
             (this.paginator.pageSize),
             this.sort.active,
@@ -87,6 +87,15 @@ export class PropertyLeaseComponent implements OnInit, AfterViewInit {
      * Handle search and pagination
      */
     ngAfterViewInit() {
+        fromEvent(this.search.nativeElement, 'keyup')
+            .pipe(
+                debounceTime(1000),
+                distinctUntilChanged(),
+                tap(() => {
+                    this.paginator.pageIndex = 0;
+                    this.loadData();
+                })
+            ).subscribe();
         this.paginator.page.pipe(
             tap(() => this.loadData() )
         ).subscribe();

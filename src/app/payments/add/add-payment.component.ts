@@ -69,6 +69,7 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
     protected _onDestroy = new Subject<void>();
 
     tenantsFiltered$: Observable<any>;
+     myFiles: any;
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
@@ -191,6 +192,9 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
      * Create payment
      */
     create() {
+        const formData = new FormData();
+        formData.append('attach',this.myFiles)
+        formData.append('type','create')
         const body = Object.assign({}, this.payment, this.form.value);
         body.tenant_id = this.tenantID;
         body.property_id = this.propertyID;
@@ -201,6 +205,8 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
 
         this.paymentService.create(body)
             .subscribe((data) => {
+                    this.paymentService.uploadPhoto(formData).subscribe((data) => {})
+
                     this.onSaveComplete();
                     this.notification.showNotification('success', 'Success !! New payment created.');
                 },
@@ -241,6 +247,10 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
     ngOnDestroy() {
         this._onDestroy.next();
         this._onDestroy.complete();
+    }
+
+    onProfilePhotoSelect(event: any) {
+        this.myFiles = event.target.files[0];
     }
 
 }

@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { API_VERSION } from '../../assets/config/api-version';
+import {ActivatedRoute} from "@angular/router";
+
 
 export class BaseService<T extends BaseModel> {
 
@@ -17,21 +19,20 @@ export class BaseService<T extends BaseModel> {
         const parsedUrl = new URL(window.location.href);
 
         this.apiUrl = this.protocol + parsedUrl.hostname + this.version;
-
-        console.log('parsedUrl');
-        console.log(parsedUrl);
-        console.log(parsedUrl.href);
+        console.log(parsedUrl.hostname)
+        console.log(this.version)
 
         const href = parsedUrl.href;
         const productionHost = href.substring(0, href.indexOf('#'));
-        console.log(productionHost);
 
-
-
+        let port = ''
+        if (parsedUrl.hostname == "localhost"){
+            port = ":8000"
+        }
         if ((parsedUrl.protocol) === 'https:') {
-            this.apiUrl = 'https://' + parsedUrl.hostname + this.version;
+            this.apiUrl = 'https://' + parsedUrl.hostname + port + this.version;
         } else {
-            this.apiUrl = 'http://' + parsedUrl.hostname + this.version;
+            this.apiUrl = 'http://' + parsedUrl.hostname + port + this.version;
         }
 
         if (environment.production) {
@@ -135,9 +136,11 @@ export class BaseService<T extends BaseModel> {
      * @param uuid
      */
     getById(uuid: string): Observable<T> {
+        // console.log(this.route.url)
         return this.httpClient
             .get<T>(this.getItemUrl(uuid));
     }
+
 
     /**
      * @param url
@@ -220,6 +223,10 @@ export class BaseService<T extends BaseModel> {
      */
     public nestedPaymentsUrl(baseEntityID: string) {
         return `${this.getResourceUrl()}/${baseEntityID}/payments`;
+    }
+
+    public nestedPayments_landlordUrl(unitID: string) {
+        return `${this.getResourceUrl()}/unit/${unitID}/payments`;
     }
 
     public nestedPaymentUrl(baseEntityID: string, itemID: string) {

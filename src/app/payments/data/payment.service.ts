@@ -45,4 +45,9 @@ export class PaymentService extends BaseService<PaymentModel> {
         const itemUrl = 'receipt';
         return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item, { responseType: 'blob' as 'json'});
     }
+
+    public uploadPhoto(item: any): any {
+        const itemUrl = 'payment_upload_attach';
+        return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
+    }
 }

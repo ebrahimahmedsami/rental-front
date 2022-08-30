@@ -1,0 +1,10 @@
+.div_lang{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.div_lang select{
+    width: 100px;
+    text-align: center;
+}

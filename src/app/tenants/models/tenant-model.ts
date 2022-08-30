@@ -28,6 +28,7 @@ export class TenantModel extends BaseModel {
     employment_postal_address: string;
     employment_status: string;
     first_name: string;
+    licence_attach: string;
     middle_name: string;
     last_name: string;
     gender: string;

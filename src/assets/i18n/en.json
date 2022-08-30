@@ -3,7 +3,23 @@
   "user-profilexx": "User Profile",
   "sidebar": {
     "dashboard": "Dashboard",
-    "profile": "Profile"
+    "profile": "Profile",
+    "landlords": "Landlords",
+    "properties": "Properties",
+    "tenants": "Tenants",
+    "leases": "Leases",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "utilities": "utilities",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "notices": "Vacate Notice",
+    "reports": "Reports"
+  },
+  "navbar": {
+    "welcome" : "Welcome",
+    "ar" : "Arabic",
+    "en" : "English"
   },
   "login": {
     "username": "Enter your user name",

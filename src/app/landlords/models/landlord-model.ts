@@ -37,4 +37,7 @@ export class LandlordModel extends BaseModel {
 
     password: string;
     password_confirmation: string;
+    national_establishment_no: string;
+    representative: string;
+    representative_id: string;
 }

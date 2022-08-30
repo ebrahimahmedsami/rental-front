@@ -84,10 +84,16 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <nav mat-tab-nav-bar>
+
+
                                         <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive"
                                            [routerLinkActiveOptions]="{exact: true}"
                                            routerLink="/properties/{{propertyID}}">
                                             <span class="nav-text"> Info </span></a>
+
+                                        <a mat-tab-link routerLinkActive #status="routerLinkActive" [active]="status.isActive"
+                                           [routerLink]="['status']">
+                                            <span class="nav-text"> Status </span></a>
 
                                         <a mat-tab-link routerLinkActive #units="routerLinkActive" [active]="units.isActive"
                                            [routerLink]="['units']">

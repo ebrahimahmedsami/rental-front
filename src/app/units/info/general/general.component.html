@@ -1,0 +1,60 @@
+<div class="row">
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+
+            <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div style="display: block">
+                            <canvas baseChart
+                                    [options]="options"
+                                    [data]="pieChartData$ | async"
+                                    [labels]="pieChartLabels"
+                                    [chartType]="pieChartType">
+
+                            </canvas>
+                        </div>
+                    </div>
+                <div class="col-sm-12">
+                    <mat-form-field class="full-width" color="primary" appearance="legacy">
+                        <mat-label>Unit Number</mat-label>
+                        <input matInput placeholder="Unit Number" disabled value="{{(unit$|async)?.unit_number}}">
+                    </mat-form-field>
+                </div>
+            </div>
+
+           <div class="row">
+                <div class="col-sm-6">
+                    <mat-form-field class="full-width" color="primary" appearance="legacy">
+                    <mat-label>Description</mat-label>
+                        <input matInput placeholder="Description" disabled value="{{(unit$|async)?.description}}">
+                    </mat-form-field>
+                </div>
+                <div class="col-sm-6">
+                    <mat-form-field class="full-width" color="primary" appearance="legacy">
+                        <mat-label>Unit Floor</mat-label>
+                        <input matInput placeholder="Unit Floor" disabled value="{{(unit$|async)?.unit_floor}}">
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <mat-form-field class="full-width" color="primary" appearance="legacy">
+                        <mat-label>Unit Mode</mat-label>
+                        <input matInput placeholder="Unit Mode" disabled value="{{(unit$|async)?.unit_mode}}">
+                    </mat-form-field>
+                </div>
+                <div class="col-sm-6">
+                    <mat-form-field class="full-width" color="primary" appearance="legacy">
+                        <mat-label>Metter</mat-label>
+                        <input matInput placeholder="Metter" disabled value="{{(unit$|async)?.square_foot}}">
+                    </mat-form-field>
+                </div>
+            </div>
+
+            </div>
+        </div>
+    </div>
+</div>

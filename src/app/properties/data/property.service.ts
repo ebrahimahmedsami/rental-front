@@ -37,6 +37,11 @@ export class PropertyService extends BaseService<PropertyModel> {
         return this.localHttpClient.post<any>(url, {filter: item});
     }
 
+    status(uuid): Observable<any> {
+        const endpoint = 'status';
+        const url =  `${super.getResourceUrl()}/${endpoint}/${uuid}`;
+        return this.localHttpClient.get<any>(url);
+    }
     /**
      *
      * @param item
@@ -55,5 +60,10 @@ export class PropertyService extends BaseService<PropertyModel> {
         const endpoint = 'report';
         const url =  `${super.getResourceUrl()}/${endpoint}`;
         return this.localHttpClient.post<any>(url, item, { responseType: 'blob' as 'json'});
+    }
+
+    public uploadPhoto(item: any): any {
+        const itemUrl = 'upload_photo';
+        return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
 }

@@ -18,9 +18,12 @@ export class LeaseModel extends BaseModel {
     generate_invoice_on: string;
     next_period_billing: boolean;
     skip_starting_period: boolean;
+    auto_renw_activation: boolean;
     waive_penalty: boolean;
 
     lease_type: any;
+    payments_invoicing: any;
+    terms: any;
     utility_deposits: any;
     utility_charges: any;
     extra_charges: any;
@@ -30,4 +33,9 @@ export class LeaseModel extends BaseModel {
 
     created_by: string;
     updated_by: string;
+    end_date: any;
+    files: any;
+    propose: any;
+    discount_type: any;
+    discount_value: any;
 }

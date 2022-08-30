@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import {fromEvent, merge} from 'rxjs';
+import {debounceTime, distinctUntilChanged, tap} from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
 import { LeaseDataSource } from '../../../leases/data/lease-data.source';
 import { LeaseService } from '../../../leases/data/lease.service';
@@ -11,6 +11,9 @@ import { TenantModel } from '../../../tenants/models/tenant-model';
 import { TenantService } from '../../../tenants/data/tenant.service';
 import { LeaseModel } from '../../../leases/models/lease-model';
 import { PropertyDataSource } from '../../data/property-data.source';
+import {UnitModel} from "../../../units/model/unit-model";
+import { UnitService } from './unit.service';
+
 
 @Component({
     selector: 'robi-property-unit',
@@ -19,6 +22,7 @@ import { PropertyDataSource } from '../../data/property-data.source';
 })
 export class PropertyUnitComponent implements OnInit, AfterViewInit {
     unitColumns = [
+        'unit_number',
         'unit_name',
         'unit_type_id',
         'unit_mode',
@@ -50,6 +54,8 @@ export class PropertyUnitComponent implements OnInit, AfterViewInit {
     constructor(private notification: NotificationService,
                 private leaseService: LeaseService,
                 private tenantService: TenantService,
+                private unitService: UnitService,
+
                 private propertyService: PropertyService) {}
 
     ngOnInit() {
@@ -73,7 +79,7 @@ export class PropertyUnitComponent implements OnInit, AfterViewInit {
     loadData() {
         this.unitDataSource.loadNested(
             this.propertyService.nestedUnitsUrl(this.propertyID),
-            '',
+            this.search.nativeElement.value,
             (this.paginator.pageIndex + 1),
             (this.paginator.pageSize),
             this.sort.active,
@@ -85,6 +91,16 @@ export class PropertyUnitComponent implements OnInit, AfterViewInit {
      * Handle search and pagination
      */
     ngAfterViewInit() {
+        fromEvent(this.search.nativeElement, 'keyup')
+            .pipe(
+                debounceTime(1000),
+                distinctUntilChanged(),
+                tap(() => {
+                    this.paginator.pageIndex = 0;
+                    this.loadData();
+                })
+            ).subscribe();
+
         this.paginator.page.pipe(
             tap(() => this.loadData() )
         ).subscribe();
@@ -113,5 +129,9 @@ export class PropertyUnitComponent implements OnInit, AfterViewInit {
 
     onLeaseSelected(lease: LeaseModel): void {
         this.leaseService.changeSelectedLease(lease);
+    }
+
+    onSelected(unit: UnitModel): void {
+       // this.unitService.changeSelectedLease(unit);
     }
 }

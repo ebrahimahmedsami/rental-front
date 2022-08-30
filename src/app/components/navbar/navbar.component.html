@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="navbar-wrapper">
             <ng-container class="navbar-brand" *ngIf="userNames$ | async as names">
-                Welcome, {{names}}
+                {{'navbar.welcome' | translate}}, {{names}}
             </ng-container>
         </div>
         <button mat-raised-button class="navbar-toggler" type="button" (click)="sidebarToggle()">
@@ -13,19 +13,33 @@
         </button>
 
         <div class="collapse navbar-collapse justify-content-end" id="navigation">
-            <ul class="navbar-nav" *ngIf="isAdmin$ | async">
-                <li class="nav-item">
-                    <a class="nav-link" [routerLink]="['/settings']">
-                        <i class="material-icons">settings</i>
-                        <p>
-                            <span class="d-lg-none d-md-block">settings</span>
-                        </p>
-                    </a>
-                </li>
+            <ul class="navbar-nav">
+                <template *ngIf="isAdmin$ | async">
+                    <li class="nav-item">
+                        <a class="nav-link" [routerLink]="['/settings']">
+                            <i class="material-icons">settings</i>
+                            <p>
+                                <span class="d-lg-none d-md-block">settings</span>
+                            </p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" [routerLink]="['/profile']">
+                            <i class="material-icons">person</i>
+                        </a>
+                    </li>
+                </template>
 
                 <li class="nav-item">
-                    <a class="nav-link" [routerLink]="['/profile']">
-                        <i class="material-icons">person</i>
+                    <a class="nav-link" >
+                        <div class="form-group div_lang">
+                            <img [src]="'../../../assets/img/'+flag+'.png'" width="20px">
+                            <select id="lang" (change)="changeLanguage($event)" class="form-control">
+                                <option  value="en" [selected]="lang == 'en'">{{'navbar.en' | translate}}</option>
+                                <option value="ar" [selected]="lang == 'ar'">{{'navbar.ar' | translate}}</option>
+                            </select>
+                        </div>
                     </a>
                 </li>
             </ul>

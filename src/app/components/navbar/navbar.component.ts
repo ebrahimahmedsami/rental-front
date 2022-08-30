@@ -6,6 +6,7 @@ import { select, Store } from '@ngrx/store';
 import { selectorUserFirstAndLastNames } from '../../authentication/authentication.selectors';
 import { AuthenticationService } from '../../authentication/authentication.service';
 import { Observable } from 'rxjs';
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'robi-navbar',
@@ -20,16 +21,21 @@ export class NavbarComponent implements OnInit {
     private sidebarVisible: boolean;
 
     userNames$: any;
+    lang;
     isAdmin$: Observable<boolean>;
+    flag;
     constructor(location: Location,  private element: ElementRef,
                 private authenticationService: AuthenticationService,
-                private router: Router, private store: Store) {
+                private router: Router, private store: Store,
+                private translate: TranslateService) {
         this.isAdmin$ = this.authenticationService.isAdmin();
         this.location = location;
         this.sidebarVisible = false;
     }
 
     ngOnInit() {
+        this.lang = localStorage.getItem('lang') || 'en';
+        this.flag = localStorage.getItem('lang') || 'en';
         this.userNames$ = this.store.pipe(select(selectorUserFirstAndLastNames));
 
         this.listTitles = ADMIN_ROUTES.filter(listTitle => listTitle);
@@ -44,7 +50,14 @@ export class NavbarComponent implements OnInit {
          }
      });
     }
-
+    changeLanguage(event){
+        let lang = event.target.value;
+        this.flag = lang
+        localStorage.setItem('lang',lang)
+        this.translate.setDefaultLang('en');
+        this.translate.use(localStorage.getItem('lang') || 'en');
+        // location.reload()
+    }
     sidebarOpen() {
         const toggleButton = this.toggleButton;
         const body = document.getElementsByTagName('body')[0];

@@ -21,57 +21,57 @@ declare interface RouteInfo {
     permission?: any;
 }
 export const ADMIN_ROUTES: RouteInfo[] = [
-    { path: '/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['view-dashboard'] },
+    { path: '/dashboard', title: 'sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['view-dashboard'] },
 
-    { path: '/landlords', title: 'robi.sidebar.landlords',  icon: 'people_outline', class: '',
+    { path: '/landlords', title: 'sidebar.landlords',  icon: 'people_outline', class: '',
         permission: ['view-landlord', 'create-landlord', 'edit-landlord', 'delete-landlord'] },
 
-    { path: '/properties', title: 'robi.sidebar.properties',  icon: 'business', class: '',
+    { path: '/properties', title: 'sidebar.properties',  icon: 'business', class: '',
         permission: ['view-property', 'create-property', 'edit-property', 'delete-property'] },
 
-    { path: '/tenants', title: 'robi.sidebar.tenants',  icon: 'group_add', class: '',
+    { path: '/tenants', title: 'sidebar.tenants',  icon: 'group_add', class: '',
         permission: ['view-tenant', 'create-tenant', 'edit-tenant', 'delete-tenant'] },
 
-    { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '',
+    { path: '/leases', title: 'sidebar.leases',  icon: 'gavel', class: '',
         permission: ['view-lease', 'create-lease', 'edit-lease', 'delete-lease'] },
 
-    { path: '/readings', title: 'robi.sidebar.utilities',  icon: 'pool', class: '',
+    { path: '/readings', title: 'sidebar.utilities',  icon: 'pool', class: '',
         permission: ['view-reading', 'create-reading', 'edit-reading', 'delete-reading'] },
 
-    { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'receipt', class: '',
+    { path: '/invoices', title: 'sidebar.invoices',  icon: 'receipt', class: '',
         permission: ['view-invoice'] },
 
-    { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '',
+    { path: '/payments', title: 'sidebar.payments',  icon: 'payment', class: '',
         permission: ['view-payment', 'create-payment'] },
 
-    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '',
+    { path: '/notices', title: 'sidebar.notices',  icon: 'lock_open', class: '',
         permission: ['view-notice', 'create-notice', 'edit-notice', 'delete-notice'] },
 
-    { path: '/settings', title: 'robi.sidebar.setting',  icon: 'settings', class: '',
+    { path: '/settings', title: 'sidebar.settings',  icon: 'settings', class: '',
         permission: ['manage-setting'] },
 
     { path: '/profile', title: 'sidebar.profile',  icon: 'person', class: '',
         permission: ['view-profile'] },
 
-    { path: '/reports', title: 'Reports',  icon: 'account_tree', class: '',
+    { path: '/reports', title: 'sidebar.reports',  icon: 'account_tree', class: '',
         permission: ['view-report'] },
 ];
 
 export const LANDLORD_ROUTES: RouteInfo[] = [
-    { path: '/landlord/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-landlord'] },
-    { path: '/properties', title: 'robi.sidebar.properties',  icon: 'business', class: '', permission: ['am-landlord'] },
-    { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['am-landlord'] },
-    { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-landlord'] },
-    { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'receipt', class: '', permission: ['am-landlord'] },
-    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '', permission: ['am-landlord'] },
+    { path: '/landlord/dashboard', title: 'sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-landlord'] },
+    { path: '/properties', title: 'sidebar.properties',  icon: 'business', class: '', permission: ['am-landlord'] },
+    { path: '/leases', title: 'sidebar.leases',  icon: 'gavel', class: '', permission: ['am-landlord','create-lease'] },
+    { path: '/payments', title: 'sidebar.payments',  icon: 'payment', class: '', permission: ['am-landlord'] },
+    { path: '/invoices', title: 'sidebar.invoices',  icon: 'receipt', class: '', permission: ['am-landlord'] },
+    { path: '/notices', title: 'sidebar.notices',  icon: 'lock_open', class: '', permission: ['am-landlord'] },
     { path: '/landlord/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-landlord'] },
 ];
 
 export const TENANT_ROUTES: RouteInfo[] = [
-    { path: '/tenant/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-tenant'] },
-    { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['am-tenant'] },
-    { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-tenant'] },
-    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '', permission: ['am-tenant'] },
+    { path: '/tenant/dashboard', title: 'sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-tenant'] },
+    { path: '/leases', title: 'sidebar.leases',  icon: 'gavel', class: '', permission: ['am-tenant'] },
+    { path: '/payments', title: 'sidebar.payments',  icon: 'payment', class: '', permission: ['am-tenant'] },
+    { path: '/notices', title: 'sidebar.notices',  icon: 'lock_open', class: '', permission: ['am-tenant'] },
     { path: '/tenant/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-tenant'] },
 ];
 

@@ -31,11 +31,20 @@ const routes: Routes = [
       {
         path: 'landlords',
         loadChildren: () => import('./landlords/landlord.module').then(m => m.LandlordModule),
-        canActivate: [AuthGuardAdmin],
-        canLoad: [PermGuard],
-        data: {
-          permissions: ['view-landlord', 'create-landlord', 'edit-landlord', 'delete-landlord']
-        }
+        // canActivate: [AuthGuardAdmin],
+        // canLoad: [PermGuard],
+        // data: {
+        //   permissions: ['view-landlord', 'create-landlord', 'edit-landlord', 'delete-landlord']
+        // }
+      },
+      {
+        path: 'units',
+        loadChildren: () => import('./units/unit.module').then(m => m.UnitModule),
+        // canActivate: [AuthGuardAdmin],
+        // canLoad: [PermGuard],
+        // data: {
+        //   permissions: ['view-landlord', 'create-landlord', 'edit-landlord', 'delete-landlord']
+        // }
       },
       {
         path: 'properties',
